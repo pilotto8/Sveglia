@@ -106,7 +106,7 @@ int d = 0;
 int t = 100;
 int i = 0;
 
-boolean adjustlight = false;
+boolean adjustlight = false;///////////////
 int adstdby = 1;
 int calstdby = 0;
 int calstdby1 = 0;
@@ -209,7 +209,7 @@ int autodayact = 0;
 String inputString = "";
 bool stringComplete = false;
 
-#define navvisi 3
+#define navvisi 4
 int noti[navvisi];
 boolean ifnot = false;
 boolean push = false;
@@ -217,11 +217,12 @@ void setnot(int s) {
   noti[s] = 1;
   ifnot = true;
 }
-int notmap[navvisi] {8, 3, 10};
+int notmap[navvisi] {8, 3, 10,};
 const char* notitext[navvisi][2] = {
   {"Ripristino", "disponibile"},
   {"Calibra", "sensore"},
-  {"Routine", "disponibile"}
+  {"Routine", "disponibile"},
+  {"Errore", "codice"}
 };
 void mostranot() {
   for (a = 0, fine = false; noti[a] == 0 && fine == false; a++) {
@@ -339,10 +340,7 @@ void loop() {
       tone(4, melody[4], 80);
       Delay(1);
       if (fer % 3 == 0) {
-        if (luxmin > darck + luxtoll){
-            antlam = stop + 1;
-        }
-        else if (lum(true) == true && antlam <= stop) {
+        if (lum(true) == true && antlam <= stop) {
           it = 1;
           fer = 0;
           Darck();
@@ -427,11 +425,15 @@ void loop() {
   if (digitalRead(6) == LOW) {
     if (adstdby > 0 && fine1 == false) {
       fine1 = true;
-      durwakeup = durwakeup + ((calstdby * sleep / 300) / adstdby);
-      durwakeup = durwakeup - (durwakeup % 20);
+      durwakeup += (int)((calstdby * sleep / 300) / adstdby);
       calstdby1 = 0;
       Serial.println(durwakeup);
       EEPROM.update(11, durwakeup / 20);
+      if (durwakeup <= 0){
+        setnot(3);
+        push = true;
+        durwakeup = 20;
+      }
     }
     Light();
     antlam = 0;
@@ -522,6 +524,10 @@ void loop() {
             if (autoday[settind][r] != autoday[settind][(r + 1) % 7] && autoday[settind][r] != -1 && autoday[settind][(r + 1) % 7] != -1) {
               fine = false;
             }
+          }
+          if(autoday[settind][r] > 4 || autoday[settind][r] < -1){
+            setnot(3);
+            push = true;
           }
         }
         if (q >= 4 && fine == false) {
@@ -1658,11 +1664,15 @@ void loop() {
     }
     if (adstdby > 0 && fine1 == false) {
       fine1 = true;
-      durwakeup = durwakeup + ((calstdby * sleep / 300) / adstdby);
-      durwakeup = durwakeup - (durwakeup % 20);
+      durwakeup += (int)((calstdby * sleep / 300) / adstdby);
       calstdby1 = 0;
       Serial.println(durwakeup);
       EEPROM.update(11, durwakeup / 20);
+      if (durwakeup <= 0){
+        setnot(3);
+        push = true;
+        durwakeup = 20;
+      }
     }
     Light();
     if (Switch == 2) {
@@ -1866,9 +1876,14 @@ void loop() {
           if (calstdby1 == 3 + adstdby) {
             calstdby1 = 0;
             if (durwakeup > 20) {
-              durwakeup = durwakeup - 20;
+              durwakeup -= 20;
               Serial.println(durwakeup);
               EEPROM.update(11, durwakeup / 20);
+              if (durwakeup <= 0){
+                setnot(3);
+                push = true;
+                durwakeup = 20;
+              }
             }
           }
         }
@@ -1945,10 +1960,7 @@ void loop() {
 
   // Sensore di luce
   Delay(2);
-  if (luxmin > darck + luxtoll){
-      antlam = stop + 1;
-  }
-  else if (lum(true) == true && antlam <= stop) {
+  if (lum(true) == true && antlam <= stop) {
     if (digitalRead(6) == HIGH) {
       Light();
       Darck();
@@ -2015,7 +2027,6 @@ void Light() {
   if (adstdby > 0) {
     calstdby = 0;
   }
-
   digitalWrite(2, HIGH);
 }
 
@@ -2079,9 +2090,7 @@ void Delay(int mode) {
     else {
       ta = 130;
     }
-
     lum(false);
-
     for (/*null*/; ta >= 0 && digitalRead(3) == LOW; ta--) {
       //if (lum(false) == true && luxmin <= darck + luxtoll && antlam <= stop) {
         //ta = 0;
