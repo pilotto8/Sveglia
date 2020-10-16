@@ -156,7 +156,6 @@ int refresh = 1;
 int r = 0;
 int q = 0;
 
-// Da ottimizzare con righe e colonne
 int Setin[] {5, 0, 4, 0, 4, 0, 3, 0, 4, 0, 7, 0, 6, 0, 4, 0, 2, 0, 2, 0, 0, 0};
 const int in[] = {
   0, 0, 8, 0, 0, 1, 8, 1, 15, 1,
@@ -170,7 +169,6 @@ const int in[] = {
   2, 1, 8, 1,
   0, 1, 9, 1
 };
-////////////////////////////////////
 
 int rallenta = 0;
 int mode[] {0, 0, 0, 0, 0, 0, 0};
@@ -294,6 +292,7 @@ void setup() {
     for (r = 0; r < 5; r++) {
       for (q = 0; q < 7; q++) {
         autoday[r][q] = -1;
+        EEPROM.update(q * 7 + 33 + r, 0);
       }
     }
   }
@@ -392,7 +391,7 @@ void loop() {
       if (light == 0) {
         light = 40;//5+35
       }
-      t = 250;
+      t = 500;
       delay(t);
       digitalWrite(2, HIGH);
       lam++;
