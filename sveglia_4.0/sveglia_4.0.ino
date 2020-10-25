@@ -209,11 +209,15 @@ bool stringComplete = false;
 
 #define navvisi 4
 int noti[navvisi];
-boolean ifnot = false;
+int avvisato[navvisi];
+short int ifnot = 0;
 boolean push = false;
 void setnot(int s) {
-  noti[s] = 1;
-  ifnot = true;
+  if (noti[s] == 0){
+    noti[s] = 1;
+    ifnot++;
+    push = true;
+  }
 }
 int notmap[navvisi] {8, 3, 10,};
 const char* notitext[navvisi][2] = {
@@ -222,11 +226,19 @@ const char* notitext[navvisi][2] = {
   {"Routine", "disponibile"},
   {"Errore", "codice"}
 };
-void mostranot() {
+void mostranot(boolean soloAvviso) {
   for (a = 0, fine = false; noti[a] == 0 && fine == false; a++) {
-    if (noti[a] == 1) {
+    if (noti[a] == 1 && (avvisato[a] == 0 && soloAvviso == false)) {
       fine = true;
     }
+  }
+  if (soloAvviso == true){
+    avvisato[a] = 1;
+  }
+  else {
+    avvisato[a] = 0;
+    noti[a] = 0;
+    ifnot--;
   }
   lcd.setCursor(3, 0);
   lcd.print(notitext[a][0]);
@@ -284,7 +296,6 @@ void setup() {
   if (EEPROM.read(0) == 1 || EEPROM.read(69) == 0) {
     if (EEPROM.read(69) == 1) {
       setnot(0);
-      push = true;
     }
     for (q = 0; q < 7; q++) {
       mode[q] = -1;
@@ -426,11 +437,10 @@ void loop() {
       fine1 = true;
       durwakeup += (int)((calstdby * sleep / 300) / adstdby);
       calstdby1 = 0;
-      Serial.println(durwakeup);
+      //Serial.println(durwakeup);
       EEPROM.update(11, durwakeup / 20);
       if (durwakeup <= 0){
         setnot(3);
-        push = true;
         durwakeup = 20;
       }
     }
@@ -450,7 +460,6 @@ void loop() {
       }
       if (volfoto == 0) {
         setnot(1);
-        push = true;
       }
       else {
         volfoto = 0;
@@ -526,12 +535,10 @@ void loop() {
           }
           if(autoday[settind][r] > 4 || autoday[settind][r] < -1){
             setnot(3);
-            push = true;
           }
         }
         if (q >= 4 && fine == false) {
           setnot(2);
-          push = true;
         }
       }
     }
@@ -552,10 +559,8 @@ void loop() {
       delay(65);
       setlux++;
       if (setlux == 6) {
-        if (ifnot == true) {
-          mostranot();
-          noti[a] = 0;
-          ifnot = false;
+        if (ifnot > 0) {
+          mostranot(false);
           s = notmap[a];
           if (digitalRead(SW_pin) == HIGH) {
             delay(1000);
@@ -661,7 +666,7 @@ void loop() {
         setin += 2;
         jy = jy + 1;
         if (refresh == 1) {
-          Serial.println("-----------------");
+          //Serial.println("-----------------");
           lcd.clear();
           setin = Setin[s * 2 - 2];
           setin1 = Setin[s * 2 - 1];
@@ -1530,9 +1535,9 @@ void loop() {
           lcd.print(F("Cosa vuoi fare?"));
         }
       }
-      if(r == 1 && refresh >= 1){
+      /*if(r == 1 && refresh >= 1){
           Serial.println(jx);
-      }
+      }*/
       
       // Rallenta aggiornamento variabile
       if (ra == true) {
@@ -1665,11 +1670,10 @@ void loop() {
       fine1 = true;
       durwakeup += (int)((calstdby * sleep / 300) / adstdby);
       calstdby1 = 0;
-      Serial.println(durwakeup);
+      //Serial.println(durwakeup);
       EEPROM.update(11, durwakeup / 20);
       if (durwakeup <= 0){
         setnot(3);
-        push = true;
         durwakeup = 20;
       }
     }
@@ -1880,7 +1884,6 @@ void loop() {
               EEPROM.update(11, durwakeup / 20);
               if (durwakeup <= 0){
                 setnot(3);
-                push = true;
                 durwakeup = 20;
               }
             }
@@ -1936,8 +1939,14 @@ void loop() {
   
   // Notifiche
   if (light > 0 && al == 0) {
-    if (ifnot == true) {
-      lcd.setCursor(15, 0);
+    if (ifnot > 0) {
+      if (ifnot > 1){
+        lcd.setCursor(14, 0);
+        lcd.print(ifnot);
+      }
+      else{
+        lcd.setCursor(15, 0);
+      }
       amb1 = (amb1 + 1) % 10;
       if (amb1 <= 5) {
         lcd.print("*");
@@ -1951,16 +1960,19 @@ void loop() {
       light = durlight;
       reloadinf = true;
       lcd.clear();
-      mostranot();
+      mostranot(true);
       delay(1500);
       lcd.clear();
     }
   }
 
   // Sensore di luce
+  if (luxarray[0] > darck + fotores + luxtoll){
+    antlam = stop + 1;
+  }
   Delay(2);
   if (lum(true) == true && antlam <= stop) {
-    if (light < 0){
+    if (light == 0){
       antlam++;
     }
     if (digitalRead(6) == HIGH) {
@@ -1971,7 +1983,6 @@ void loop() {
       if (antlam == stop) {
         py = 0;
         setnot(1);
-        push = true;
       }
       volfoto++;
       if (al == 1 && it == 0) {
@@ -2110,7 +2121,7 @@ void Delay(int mode) {
          o1 = dt.hour;
          m1 = dt.minute;
       }
-      if ((digitalRead(6) == LOW && light == 0) || (lum(false) == true && luxmin <= darck + luxtoll && antlam <= stop) || millis() - scpu > t - sleepmode) {
+      if ((digitalRead(6) == LOW && light == 0) || (lum(false) == true && antlam <= stop) || millis() - scpu > t - sleepmode) {
         ta = 0;
       }
     }
@@ -2286,7 +2297,7 @@ void ripristino() {
 }
 void backup() {
   int read;
-  Serial.println("Backup...");
+  //Serial.println("Backup...");
   for (int ind = 0; ind < varmax + 1; ind++) {
     switch (ind) {
       case 0: {
@@ -2390,7 +2401,7 @@ void backup() {
     Serial.println(read);
     EEPROM.update(ind, read);
   }
-  Serial.println("Fine backup...");
+  //Serial.println("Fine backup...");
   abclean();
 }
 
@@ -2437,10 +2448,10 @@ boolean lum(boolean prec) {
   if (prec == true) {
     for (a = luxvel; a >= 0; a--) {
       luxarray[a + 1] = luxarray[a];
-      Serial.print(luxarray[a + 1]);
-      Serial.print("\t");
+      //Serial.print(luxarray[a + 1]);
+      //Serial.print("\t");
     }
-    Serial.println("");
+    //Serial.println("");
     luxarray[0] = maxlux1;
     diff = luxarray[0] - luxmin;
     if (luxarray[0] < luxmin) {
