@@ -1960,6 +1960,9 @@ void loop() {
   // Sensore di luce
   Delay(2);
   if (lum(true) == true && antlam <= stop) {
+    if (light < 0){
+      antlam++;
+    }
     if (digitalRead(6) == HIGH) {
       Light();
       Darck();
@@ -1970,7 +1973,6 @@ void loop() {
         setnot(1);
         push = true;
       }
-      antlam++;
       volfoto++;
       if (al == 1 && it == 0) {
         it = 1;
