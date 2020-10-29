@@ -123,8 +123,8 @@ unsigned int luxmin = 1024;
 int fotores = 50;
 int fotores1 = fotores;
 boolean risveglio = true;
-int darck = 5;
-int darckmode = 1;
+int dark = 5;
+int darkmode = 1;
 int volfoto = 1;
 int c = 1;
 int onoff = 0;
@@ -353,7 +353,7 @@ void loop() {
         if (lum(true) == true && antlam <= stop) {
           it = 1;
           fer = 0;
-          Darck();
+          Dark();
           tone(4, melody[3], 20);
         }
       }
@@ -423,7 +423,7 @@ void loop() {
       amb = 0;
       svdomani();
     }
-    if (it == 1 && luxmin <= darck) {
+    if (it == 1 && luxmin <= dark) {
       d++;
     }
     else {
@@ -451,10 +451,10 @@ void loop() {
   // Programmazione settimanale
   if (dt.hour == 0 && dt.minute == 0) {
     if (ra == false) {
+      ra = true;
       dt = clock.getDateTime();
       gset(dt.year);
       svdomani();
-      ra = true;
       if (Ripeti == 2) {
         ora = true;
       }
@@ -499,7 +499,7 @@ void loop() {
           manual = false;
         }
         if (c == 0 && autodayact == 1) {
-          autoday[settind][day] = sv;
+          autoday[settind][day] = 0;
           ora1 = true;
           EEPROM.update(settind * 7 + day + 33, 1);
         }
@@ -866,28 +866,28 @@ void loop() {
           }
           if (jy == 1) {
             if (r == 1) {
-              if (darckmode == 1) {
+              if (darkmode == 1) {
                 jx = -1;
               } else {
-                jx = darck;
+                jx = dark;
               }
               MaxX = 250;
               MinX = -1;
             }
-            darck = jx;
-            if (darck == -1) {
-              darckmode = 1;
+            dark = jx;
+            if (dark == -1) {
+              darkmode = 1;
               lcd.print("auto");
             }
             else {
-              darckmode = 0;
-              if (darck < 100) {
+              darkmode = 0;
+              if (dark < 100) {
                 lcd.print("_");
-                if (darck < 10) {
+                if (dark < 10) {
                   lcd.print("_");
                 }
               }
-              lcd.print(darck);
+              lcd.print(dark);
               lcd.print(" ");
             }
             lam = 4;
@@ -922,7 +922,7 @@ void loop() {
                   Maxlux = luxarray[0];
                 }
                 if ((luxarray[0] - luxmin) >= 2 + Maxlux * 5 / 10 && v == 8) {
-                  darck = luxmin + 1;
+                  dark = luxmin + 1;
                   for (v = 0; v < maxlung - 3 && luxvel == 10; v++) {
                     if (luxarray[v] == luxmin) {
                       luxvel = v + 2;
@@ -936,7 +936,7 @@ void loop() {
                 }
               }
               Maxlux = 0;
-              Darck();
+              Dark();
               digitalWrite(2, HIGH);
             }
           }
@@ -1592,13 +1592,13 @@ void loop() {
   if (light > 0) {
     light--;
     if (py == 1) {
-      if (luxmin <= darck && inv == false) {
+      if (luxmin <= dark && inv == false) {
         inv = true;
         Inv = durlight - light;
       }
       if (inv == true) {
         if (light <= durlight - invo - Inv * semp) {
-          if (luxmin <= darck) {
+          if (luxmin <= dark) {
             light = 0;
           }
         }
@@ -1829,7 +1829,7 @@ void loop() {
         }
         else {
           if (autodayact == 1) {
-            autoday[settind][day] = sv;
+            autoday[settind][day] = 0;
             ora1 = true;
             EEPROM.update(settind * 7 + day + 33, 1);
           }
@@ -1967,7 +1967,7 @@ void loop() {
   }
 
   // Sensore di luce
-  if (luxarray[0] > darck + fotores + luxtoll){
+  if (luxarray[0] > dark + fotores + luxtoll){
     antlam = stop + 1;
   }
   Delay(2);
@@ -1977,7 +1977,7 @@ void loop() {
     }
     if (digitalRead(6) == HIGH) {
       Light();
-      Darck();
+      Dark();
       inv = false;
       py = 1;
       if (antlam == stop) {
@@ -2064,9 +2064,9 @@ int temp(boolean interfaccia) {
 }
 
 // Buio dinamico
-void Darck() {
-  if (darckmode == 1 && risveglio == true) {
-    darck = luxmin;
+void Dark() {
+  if (darkmode == 1 && risveglio == true) {
+    dark = luxmin;
   }
   risveglio = false;
   luxmin = luxarray[0];
@@ -2104,7 +2104,7 @@ void Delay(int mode) {
     }
     lum(false);
     for (/*null*/; ta >= 0 && digitalRead(3) == LOW; ta--) {
-      //if (lum(false) == true && luxmin <= darck + luxtoll && antlam <= stop) {
+      //if (lum(false) == true && luxmin <= dark + luxtoll && antlam <= stop) {
         //ta = 0;
       //}
       delay(1);
@@ -2172,6 +2172,7 @@ void gset(int year) {
   day = gior % 7;
   settind = (gior + 1) / 7;
   settind = settind % 6;
+  EEPROM.update(32, settind);
 }
 boolean bisestile(int year2) {
   if ((year2 % 4 == 0 && year2 % 100 != 0) || year2 % 400 == 0) {
@@ -2218,11 +2219,11 @@ void ripristino() {
           break;
         }
       case 15: {
-          darck = read;
+          dark = read;
           break;
         }
       case 16: {
-          darckmode = read;
+          darkmode = read;
           break;
         }
       case 17: {
@@ -2262,11 +2263,14 @@ void ripristino() {
           break;
         }
       case 32: {
-          //settind = read;
+          settind = read;
           break;
         }
       case 33 ... 67: {
           autoday[(int)((ind - 33) / 7)][(ind - 33) % 7] = read - 1;
+          Serial.print(printday[(ind - 33) % 7]);
+          Serial.print("  ");
+          Serial.println(read - 1);
           break;
         }
       case 68: {
@@ -2329,11 +2333,11 @@ void backup() {
           break;
         }
       case 15: {
-          read = darck;
+          read = dark;
           break;
         }
       case 16: {
-          read = darckmode;
+          read = darkmode;
           break;
         }
       case 17: {
@@ -2396,9 +2400,6 @@ void backup() {
           break;
         }
     }
-    Serial.print(ind);
-    Serial.print(": ");
-    Serial.println(read);
     EEPROM.update(ind, read);
   }
   //Serial.println("Fine backup...");
