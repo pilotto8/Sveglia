@@ -2145,7 +2145,7 @@ void Delay(int mode) {
 
 // Gestione giorni, mesi e anni
 int MaxDay(int mese) {
-  if (mese == 1 || mese == 3 || mese == 5 || mese == 7 || mese == 8) {
+  if (mese == 1 || mese == 3 || mese == 5 || mese == 7 || mese == 8 || mese == 10 || mese == 12) {
     return (31);
   }
   else if (mese == 2) {
