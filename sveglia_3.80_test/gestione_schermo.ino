@@ -12,29 +12,13 @@ void spegni_schermo(){
 }
 void mostra_orologio(){
   lcd.setCursor(4, 0);
-  if ((dt.hour) < 10) {
-    lcd.print(0);
-  }
-  lcd.print(dt.hour);
-  lcd.print(":");
-  if ((dt.minute) < 10) {
-    lcd.print(0);
-  }
-  lcd.print(dt.minute);
-  lcd.print(":");
-  if ((dt.second) < 10) {
-    lcd.print(0);
-  }
-  lcd.print(dt.second);
+  lcd.print(now.toString("hh:mm:ss"))
 }
 void mostra_data(){
   lcd.setCursor(4, 1);
   lcd.print(printday[day]);
   lcd.print(" ");
-  if ((dt.day) < 10) {
-    lcd.print(0);
-  }
-  lcd.print(dt.day);
+  lcd.print(now.toString("YYYY"))
 }
 void mostra_temperatura(){
   tempReading = analogRead(A7);

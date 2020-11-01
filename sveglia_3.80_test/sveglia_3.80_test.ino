@@ -1,10 +1,9 @@
 #include <pitches.h>
-#include <DS3231.h>
 #include <LiquidCrystal.h>
 #include <Wire.h>
+#include <RTClib.h>
+RTC_DS1307 rtc;
 #include <EEPROM.h>
-DS3231 clock;
-RTCDateTime dt;
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 #include <Adafruit_SleepyDog.h>
 #define SW_pin 5
@@ -89,21 +88,20 @@ void setup() {
   pinMode(2, OUTPUT);
   Serial.begin(9600);
   inputString.reserve(20);
-  clock.begin();
-  clock.armAlarm1(false);
-  clock.armAlarm2(false);
-  clock.clearAlarm1();
-  clock.clearAlarm2();
   lcd.begin(16, 2);
   lcd.createChar(1, campanella);
   lcd.createChar(2, unavolta);
   lcd.createChar(3, ripeti);
   lcd.createChar(4, calend);
   lcd.createChar(5, cerchio);
+  if(rtc.lostPower()) {
+
+  }
 }
 void loop(){
-  dt = clock.getDateTime();
-  if (millis() % ritardoEsecuzione == 0 || interrupt == true){
-    interrupt = false;
+  DateTime now = rtc.now();
+  if (millis() - millisDiPrima >= ritardoEsecuzione || soft_interrupt() == true){
+    millisDiPrima = millis();
+
   }
 }

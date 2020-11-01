@@ -1,3 +1,5 @@
+unsigned long int millisDiPrima = 0;
+
 int variabile[50];
 enum variabili{
   numeroSveglia,
@@ -8,11 +10,21 @@ enum variabili{
   durataStandBy,
   limiteRichiesteLuce
 }
+
+
 int i, r, c;
 bool svegliaAbilitata = true;
 int schermoAcceso = 50;
 int standBy = 10;
-bool allarmeInCorso = false;
 bool rilevataInterazioneLuce = false;
 int ritardoEsecuzione = 100;
-bool interrupt = false;
+//int lampeggio;
+
+
+enum stati{
+  attivo,
+  riposo,
+  aggiorna,
+  allarmeInCorso
+}
+int statoInterazione = attvio;
