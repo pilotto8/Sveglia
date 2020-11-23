@@ -1,5 +1,5 @@
 bool rilevato_allarme() {
-  if (clock.isAlarm1() && svegliaAbilitata == 1) {
+  if (rtc.alarmFired(1) && svegliaAbilitata == 1) {
     return true;
   }
   return false;
@@ -10,7 +10,6 @@ void sveglia_triggherata() {
   lcd.clear();
   mostra_data();
   for (i = 390; digitalRead(3) == LOW && i > 0; i--) {
-    DateTime now = rtc.now();
     mostra_orologio();
     tone(4, melody[4], 80);
     // Delay(1);
@@ -32,9 +31,9 @@ void imposta_posticipo() {
     variabile[oraSveglia] = (variabile[oraSveglia] + 1) % 24;
   }
   variabile[minutiSveglia] = (variabile[minutiSveglia] + 5) % 60;
-  clock.armAlarm1(false);
-  clock.clearAlarm1();
-  clock.setAlarm1(0, variabile[oraSveglia], variabile[minutiSveglia], 0, DS3231_MATCH_H_M_S);
+  //clock.armAlarm1(false);
+  //clock.clearAlarm1();
+  //clock.setAlarm1(0, variabile[oraSveglia], variabile[minutiSveglia], 0, DS3231_MATCH_H_M_S);
   //lcd.clear();
   // lam = 0;
   /*do {
