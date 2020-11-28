@@ -118,3 +118,11 @@ int statoInterazione = attivo;
 int arrayIdealeLuce[100];
 int arrayLuce[100];
 int puntoArrayLuce = 0;
+int puntoArrayLucePrecedente = 0;
+int livelloLuceConsolidato = 0;
+enum direzioneVariazione {
+  neutro,
+  aumento,
+  diminuzione
+};
+short int variazioneSignificativa = neutro;
