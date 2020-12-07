@@ -183,7 +183,6 @@ int day;
 const char* printday[] = {"Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"};
 int cal;
 boolean ora = false;
-boolean ora1 = false;
 int amb = 0;
 int amb1 = 0;
 int antlam = 0;
@@ -204,6 +203,7 @@ int svmagg[4];
 int indic;
 int settind = 0;
 int autodayact = 0;
+int svsuonata = 0;
 String inputString = "";
 bool stringComplete = false;
 
@@ -303,7 +303,6 @@ void setup() {
     for (r = 0; r < 5; r++) {
       for (q = 0; q < 7; q++) {
         autoday[r][q] = -1;
-        EEPROM.update(q * 7 + 33 + r, 0);
       }
     }
   }
@@ -328,11 +327,8 @@ void loop() {
   // Allarme
   if (clock.isAlarm1() && c == 1 || Temp == 1 || debug == 0 || suona == true) {
     suona = false;
-    if (autodayact == 1) {
-      autoday[settind][day] = sv;
-      ora1 = true;
-      EEPROM.update(settind * 7 + day + 33, sv + 1);
-      EEPROM.update(29, sv + 1);
+    if (autodayact == 1 && post == 0) {
+      svsuonata = sv;
     }
     Light();
     setluxeq();
@@ -452,62 +448,11 @@ togliposticipo:
   if (dt.hour == 0 && dt.minute == 0) {
     if (ra == false) {
       ra = true;
-      dt = clock.getDateTime();
-      gset(dt.year);
-      svdomani();
-      if (Ripeti == 2) {
-        ora = true;
-      }
-      if (volfoto == 0) {
-        setnot(1);
-      }
-      else {
-        volfoto = 0;
-      }
-    }
-  }
-  else if (ra == true) {
-    ra = false;
-  }
-  if (al == 0) {
-    if (ora == true) {
-      ora = false;
-      if (manual == false) {
-        if (oggmanual == true) {
-          oggmanual = false;
-        }
-        else {
-          svoggi();
-        }
-        if (sv > 0) {
-          c = 1;
-          o1 = SV[sv * 2 - 2];
-          m1 = SV[sv * 2 - 1];
-          Clear(true, false);
-        }
-        else if (sv == 0) {
-          c = 0;
-          clock.armAlarm1(false);
-          clock.clearAlarm1();
-        }
-        else {
-          manual = true;
-        }
-      }
-      else {
-        if (mode[cal] != -1) {
-          manual = false;
-        }
-        if (c == 0 && autodayact == 1) {
-          autoday[settind][day] = 0;
-          ora1 = true;
-          EEPROM.update(settind * 7 + day + 33, 1);
-        }
-      }
-    }
-
-    if (ora1 == true) {
-      ora1 = false;
+      if (autodayact == 1){
+      autoday[settind][day] = svsuonata;
+      EEPROM.update(settind * 7 + day + 33, svsuonata + 1);
+      EEPROM.update(29, svsuonata + 1);
+      svsuonata = 0;
       indic = 0;
       for (r = (settind + 1) % 6, q = 0; q < 5; r = (r + 1) % 6, q++) {
         if (autoday[r][day] != -1) {
@@ -539,6 +484,58 @@ togliposticipo:
         }
         if (q >= 4 && fine == false) {
           setnot(2);
+        }
+      }
+    }
+
+
+      dt = clock.getDateTime();
+      gset(dt.year);
+      svdomani();
+      if (Ripeti == 2) {
+        ora = true;
+      }
+      if (volfoto == 0) {
+        setnot(1);
+      }
+      else {
+        volfoto = 0;
+      }
+    }
+  }
+  else if (ra == true) {
+    ra = false;
+  }
+
+
+  if (al == 0) {
+    if (ora == true) {
+      ora = false;
+      if (manual == false) {
+        if (oggmanual == true) {
+          oggmanual = false;
+        }
+        else {
+          svoggi();
+        }
+        if (sv > 0) {
+          c = 1;
+          o1 = SV[sv * 2 - 2];
+          m1 = SV[sv * 2 - 1];
+          Clear(true, false);
+        }
+        else if (sv == 0) {
+          c = 0;
+          clock.armAlarm1(false);
+          clock.clearAlarm1();
+        }
+        else {
+          manual = true;
+        }
+      }
+      else {
+        if (mode[cal] != -1) {
+          manual = false;
         }
       }
     }
@@ -650,7 +647,7 @@ togliposticipo:
               }
             }
         }
-Skip:
+        Skip:
         if (r == -1) {
           r = 1;
           l = 1;
@@ -1827,13 +1824,6 @@ Skip:
           manual = true;
           tone(4, melody[4], 25);
         }
-        else {
-          if (autodayact == 1) {
-            autoday[settind][day] = 0;
-            ora1 = true;
-            EEPROM.update(settind * 7 + day + 33, 1);
-          }
-        }
       }
       else {
         if (((o1 * 100 + m1 * 100 / 60) < (dt.hour * 100 + dt.minute * 100 / 60) && (sv != mode[cal]))) {
@@ -1878,7 +1868,7 @@ Skip:
           calstdby1++;
           if (calstdby1 == 3 + adstdby) {
             calstdby1 = 0;
-            if (durwakeup > 20) {
+            if (durwakeup > 40) {
               durwakeup -= 20;
               Serial.println(durwakeup);
               EEPROM.update(11, durwakeup / 20);
@@ -1909,9 +1899,6 @@ Skip:
     }
     else if (inputString == F("ora = true")) {
       ora = true;
-    }
-    else if (inputString == F("ora1 = ture")) {
-      ora1 = true;
     }
     else if (inputString == F("mezzanotte")) {
       clock.setDateTime(dt.year, dt.month, day, 23, 59, 55);
@@ -2264,6 +2251,7 @@ void ripristino() {
         }
       case 32: {
           settind = read;
+          Serial.println(read);
           break;
         }
       case 33 ... 67: {
