@@ -1,6 +1,7 @@
-#include "images.h"
+#include <Arduino.h>
 #include <Wire.h>
-
+#include <EEPROM.h>
+#include "images.h"
 
 #include <DHT.h>
 #include <DHT_U.h>
@@ -18,6 +19,15 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+#include "RTClib.h"
+RTC_DS3231 rtc;
+
+//RTC
+#define clock_interrupt 2
+DateTime now;
+
+//EEPROM
+#define EEPROM_used 1
 
 //Buttons
 #define button_up 3
@@ -47,17 +57,10 @@ enum alignment {
 };
 enum interfaces {
   back = -1,
-  timeInter,
-  pinInter,
-  firstConfigInter,
-  wifiCreateInter,
-  logInter,
-  scanWifiInter,
-  savedWifiInter,
   displayInter,
   buttonsInter,
   //////////////////// Don't touch them, add interfaces only above
-  menuInter,
+  homeInter,
   commandInter,
   wifiInter,
   settingsInter,
@@ -124,8 +127,8 @@ enum details_element_types{
 int element_counter = 0;
 int special_element_counter = 0;
 int icon_element_counter = 0;
-int interface = menuInter;
-int loaded_interface = timeInter;
+int interface;
+int loaded_interface;
 int previous_interface;
 int history_interface[5];
 bool oled_updated = false;

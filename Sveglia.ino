@@ -10,9 +10,34 @@ void setup() {
     for(;;); // Don't proceed, loop forever
   }
 
+  if(!rtc.begin()) {
+    Serial.println("Couldn't find RTC!");
+    Serial.flush();
+    abort();
+  }
+  
+  if(rtc.lostPower()) {
+    // this will adjust to the date and time at compilation
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
+
+  rtc.disable32K();
+
+  pinMode(clock_interrupt, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(clock_interrupt), onAlarm, FALLING);
+
+  rtc.clearAlarm(1);
+  rtc.clearAlarm(2);
+
+  rtc.writeSqwPinMode(DS3231_OFF);
+
+  rtc.disableAlarm(2);
+
+  interface = homeInter;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  now = rtc.now();
+  interfaceSelector();
 
 }

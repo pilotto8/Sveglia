@@ -196,6 +196,10 @@ void interfaceSelector() {
     Serial.println(interface);
   }
   switch (interface) {
+    case homeInter:{
+      home();
+      break;
+    }
     /*case pinInter: {
         pin();
         break;
@@ -356,8 +360,7 @@ void setParameter(int address, int min, int max){
 }
 
 void updateParameter(){
-  EEPROM.write(parameter.address, parameter.data);
-  EEPROM.commit();
+  EEPROM.update(parameter.address, parameter.data);
   parameter.data = -1;
   element_counter--;
   eepromPar(parameter.address);
@@ -436,95 +439,13 @@ int elementListSelector() { //// Funzione del boss del poppin che gestisce prati
   return -1;
 }
 
-/*int d, e, f;
-String temporaneous_pin;
-void pin() {
-  int q;
-  String message;
-  if (interface != loaded_interface) {
-    d = 0;
-    e = 0;
-    loaded_interface = interface;
-    temporaneous_pin = "_";
-    message = "There are   more tryes before erasing everything";
-    f = EEPROM.read(0);
-    message[10] = char(48 + (chances - f));
-    if (f == 0) {
-      newDisplayElement(center, 64, 15, 128, "Insert the pin");
-      Serial.println("No pin inserted");
-    }
-    else if (dialog_interface) {
-      newDisplayElement(center, 64, 15, 128, "Chose your own pin and press twice to confirm");
-      Serial.println("Chose your pin");
-    }
-    else {
-      newDisplayElement(center, 64, 15, 128, message);
-      Serial.println("Chances");
-    }
-    newDisplayElement(center, 64, 45, temporaneous_pin);
-    DEfont(element_counter - 1, 1);
-  }
-
-  if (triggButton == up) {
-    e = (e + 1) % 10;
-    temporaneous_pin[d] = char(48 + e);
-  }
-  else if (triggButton == down) {
-    e = (e + 9) % 10;
-    temporaneous_pin[d] = char(48 + e);
-  }
-  else if (triggButton == confirm) {
-    if (temporaneous_pin[d] == '_' || d == 14) {
-      String data;
-      for (q = 0; q < d; q += 2) {
-        data += temporaneous_pin[q];
-      }
-      data += '\0';
-      Serial.print("Inserted key = ");
-      Serial.println(data);
-      setMasterKey(data);
-      if (!dialog_interface) {
-        f++;
-        if (f >= chances) {
-          eepromClear();
-          ESP.restart();
-        }
-        else {
-          EEPROM.write(0, f);
-          EEPROM.commit();
-          temporaneous_pin = "_";
-          d = 0;
-          message = "There are   more tryes before erasing everything";
-          message[10] = (char)(48 + (chances - f));
-          DEdata(0, message);
-          oled_updated = false; // To make it look better I update the screen only when the pin is incorrect
-          wrong_key = false;
-        }
-        return;
-      }
-      else {
-        EEPROM.write(0, 0);
-        EEPROM.commit();
-        interfaceBack();
-      }
-    }
-    else {
-      temporaneous_pin += " _";
-      d += 2;
-    }
-    e = 0;
-  }
-  DEdata(1, temporaneous_pin);
-}
-*/
-
-const char* dialogText[] PROGMEM = {
+const char* dialogText[] = {
   "Do you want to go back to default settings?",
   "Do you want to erase everything?",
   "Someone wants to connect. Do you want it?",
   "Do you want to delete these WiFi credentials?"
 };
-const int questionLink[] PROGMEM = {
+const int questionLink[] = {
   back,
   back,
   back,
@@ -540,7 +461,7 @@ enum select_questions {
 void question() {
   if (interface != loaded_interface) {
     loaded_interface = interface;
-    newDisplayElement(left, 1, 1, 90, dialogText[interface - questionInter]);
+    newDisplayElement(1, 1, dialogText[interface - questionInter]);
     clearList();
     elements_list[0] = "No";
     elements_list[1] = "Yes";
@@ -587,6 +508,32 @@ void question() {
     }
   }
 }
+
+void home(){
+  if (interface != loaded_interface) {
+    loaded_interface = interface;
+    newDisplayElement(32, 32, "ciao merde");
+    DEfont(0, 3);
+  }
+  String date = "";
+  if (now.hour() < 10){
+    date += '0';
+  }
+  date += now.hour();
+  date += ':';
+  if (now.minute() < 10){
+    date += '0';
+  }
+  date += now.minute();
+  date += ':';
+  if (now.second() < 10){
+    date += '0';
+  }
+  date += now.second();
+  
+  DEdata(0, date);
+}
+
 /*
 void menu() {
   if (interface != loaded_interface) {
