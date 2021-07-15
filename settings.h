@@ -1,21 +1,14 @@
 #include <Arduino.h>
+#include <SPI.h>
 #include <Wire.h>
 #include <EEPROM.h>
 #include "images.h"
 
-#include <DHT.h>
-#include <DHT_U.h>
-#define DHTPIN 2
-#define DHTTYPE    DHT11
-DHT_Unified dht(DHTPIN, DHTTYPE);
-
-
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Adafruit_Sensor.h>
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -25,6 +18,13 @@ RTC_DS3231 rtc;
 //RTC
 #define clock_interrupt 2
 DateTime now;
+
+#include <DHT.h>
+#include <DHT_U.h>
+#include <Adafruit_Sensor.h>
+#define DHTPIN 7
+#define DHTTYPE DHT11
+DHT_Unified dht(DHTPIN, DHTTYPE);
 
 //EEPROM
 #define EEPROM_used 1

@@ -515,23 +515,8 @@ void home(){
     newDisplayElement(32, 32, "ciao merde");
     DEfont(0, 3);
   }
-  String date = "";
-  if (now.hour() < 10){
-    date += '0';
-  }
-  date += now.hour();
-  date += ':';
-  if (now.minute() < 10){
-    date += '0';
-  }
-  date += now.minute();
-  date += ':';
-  if (now.second() < 10){
-    date += '0';
-  }
-  date += now.second();
-  
-  DEdata(0, date);
+  char date[] = "hh:mm:ss";
+  DEdata(0, now.toString(date));
 }
 
 /*
