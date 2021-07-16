@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include <SPI.h>
+//#include <Arduino.h>
 #include <Wire.h>
 #include <EEPROM.h>
 #include "images.h"
@@ -11,6 +10,10 @@
 #define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define NUMFLAKES     10 // Number of snowflakes in the animation example
+
+#define LOGO_HEIGHT   16
+#define LOGO_WIDTH    16
 
 #include "RTClib.h"
 RTC_DS3231 rtc;
