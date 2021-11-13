@@ -127,9 +127,9 @@ enum details_element_types{
   image
 };
 
-int element_counter = 0;
-int special_element_counter = 0;
-int icon_element_counter = 0;
+byte element_counter = 0;
+byte special_element_counter = 0;
+byte icon_element_counter = 0;
 int interface;
 int loaded_interface;
 int previous_interface;
@@ -137,7 +137,7 @@ int history_interface[5];
 bool oled_updated = false;
 String elements_list[20];
 bool title_list;
-int begin_list;
+byte begin_list;
 int dialog_interface;
 
 //Timers

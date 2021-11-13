@@ -253,11 +253,11 @@ void interfaceSelector() {
         break;
       }*/
     default:{
-        question();
-        break;
+      question();
+      break;
     }
   }
-  if (oled_updated) {// Only if there is something different it Will print elements on the screen
+  if (oled_updated) {// Only if there is something different it will update the screen
     oled_updated = false;
     loadDisplay();
   }
@@ -439,7 +439,7 @@ int elementListSelector() { //// Funzione del boss del poppin che gestisce prati
   return -1;
 }
 
-const char* dialogText[] = {
+static const char* dialogText[] = {
   "Do you want to go back to default settings?",
   "Do you want to erase everything?",
   "Someone wants to connect. Do you want it?",
